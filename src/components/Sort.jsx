@@ -1,24 +1,38 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
+export const sortList = [
+  { name: "популярности (↑)", property: "rating", order: "asc" },
+  { name: "популярности (↓)", property: "rating", order: "desc" },
+  { name: "цене (↑)", property: "price", order: "asc" },
+  { name: "цене (↓)", property: "price", order: "desc" },
+  { name: "алфавиту (↑)", property: "title", order: "asc" },
+  { name: "алфавиту (↓)", property: "title", order: "desc" },
+];
 function Sort({ selected, onChangeSelected }) {
   const [visible, setVisible] = useState(false);
-
-  const sortList = [
-    { name: "популярности (↑)", property: "rating", order: "asc" },
-    { name: "популярности (↓)", property: "rating", order: "desc" },
-    { name: "цене (↑)", property: "price", order: "asc" },
-    { name: "цене (↓)", property: "price", order: "desc" },
-    { name: "алфавиту (↑)", property: "title", order: "asc" },
-    { name: "алфавиту (↓)", property: "title", order: "desc" },
-  ];
+  const sortRef = useRef();
 
   const onClickItem = (obj) => {
     onChangeSelected(obj);
     setVisible(false);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.composedPath().includes(sortRef.current)) {
+        setVisible(false);
+      }
+    };
+
+    document.body.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.body.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="sort">
+    <div ref={sortRef} className="sort">
       <div className="sort__label">
         <svg
           style={visible ? { transform: "rotate(180deg)" } : { transform: "rotate(0deg)" }}
@@ -50,5 +64,4 @@ function Sort({ selected, onChangeSelected }) {
     </div>
   );
 }
-
 export default Sort;
